@@ -1,11 +1,9 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
-import 'package:mad/views/screens/home.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import '../screens/Profile.dart';
+import '../screens/home.dart';
+import '../screens/store.dart';
 import '../screens/wishlist.dart';
-import '../screens/store.dart'; // Add this line to import StoreScreen
+import '../screens/profile.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -14,45 +12,66 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   late PersistentTabController _controller;
   bool _isLandscape = false;
+  int _currentIndex = 0; // Track the selected tab index
 
   @override
   void initState() {
     super.initState();
     _controller = PersistentTabController(initialIndex: 0);
+    WidgetsBinding.instance.addObserver(this); // Add observer for orientation changes
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // Remove observer
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    // Called when the device orientation changes
+    final orientation = MediaQuery.of(context).orientation;
+    if (orientation == Orientation.landscape && !_isLandscape) {
+      setState(() {
+        _isLandscape = true;
+      });
+    } else if (orientation == Orientation.portrait && _isLandscape) {
+      setState(() {
+        _isLandscape = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    _isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Bottom Navigation Example')),
       body: _isLandscape
-          ? const Center(child: Text('Landscape Mode - No Bottom Navigation'))
+          ? _buildScreens()[_currentIndex] // Show only the selected screen in landscape
           : PersistentTabView(
-              context,
-              controller: _controller,
-              screens: _buildScreens(),
-              items: _navBarsItems(),
-              confineToSafeArea: true,
-              backgroundColor: Colors.white,
-              handleAndroidBackButtonPress: true,
-              resizeToAvoidBottomInset: true,
-              stateManagement: true,
-              decoration: NavBarDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                colorBehindNavBar: Colors.white,
-              ),
-              onItemSelected: (index) {
-                setState(() {
-                  _controller.index = index;
-                });
-              },
-              navBarStyle: NavBarStyle.style1,
-            ),
+        context,
+        controller: _controller,
+        screens: _buildScreens(),
+        items: _navBarsItems(),
+        confineToSafeArea: true,
+        backgroundColor: Colors.white,
+        handleAndroidBackButtonPress: true,
+        resizeToAvoidBottomInset: true,
+        stateManagement: true,
+        decoration: NavBarDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          colorBehindNavBar: Colors.white,
+        ),
+        onItemSelected: (index) {
+          setState(() {
+            _currentIndex = index; // Update the selected index
+            _controller.index = index;
+          });
+        },
+        navBarStyle: NavBarStyle.style1,
+      ),
     );
   }
 

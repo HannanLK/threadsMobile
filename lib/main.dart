@@ -8,8 +8,10 @@ import 'views/screens/OnboardingScreen2.dart';
 import 'views/screens/Login.dart';
 import 'views/screens/Register.dart';
 import 'views/screens/Home.dart';
-import 'views/screens/profile.dart'; // Import ProfileScreen
-import 'views/components/bottomNav.dart'; // Import MainScreen
+import 'views/screens/Profile.dart'; // Import ProfileScreen
+import 'views/screens/Store.dart'; // Import StoreScreen
+import 'views/components/bottomNav.dart';
+import 'views/screens/wishlist.dart'; // Import MainScreen
 
 void main() {
   runApp(
@@ -63,6 +65,8 @@ class MyApp extends StatelessWidget {
                   '/register': (context) => const RegisterScreen(),
                   '/home': (context) => const HomeScreen(), // Wrap HomeScreen with MainScreen
                   '/profile': (context) => const ProfileScreen(), // Wrap ProfileScreen with MainScreen
+                  '/store': (context) => const StoreScreen(), // Wrap StoreScreen with MainScreen
+                  '/wishlist': (context) => const WishlistScreen(), // Wrap WishlistScreen with MainScreen
                   '/main': (context) => const MainScreen(), // Add MainScreen route
                 },
               );
