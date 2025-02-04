@@ -17,10 +17,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> register(
-      String name,
-      String email,
-      String password,
-      ) async {
+      String name, String email, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/register'),
       body: {
@@ -31,5 +28,19 @@ class ApiService {
     );
 
     return jsonDecode(response.body);
+  }
+
+  // Add a method to fetch profile data
+  Future<Map<String, dynamic>> fetchProfile(String token) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/profile'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load profile data');
+    }
   }
 }

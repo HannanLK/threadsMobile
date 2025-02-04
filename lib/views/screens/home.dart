@@ -6,11 +6,15 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: const Center(
-        child: Text(
-          'Welcome to the Home Page!',
-          style: TextStyle(fontSize: 20),
+      appBar: AppBar(
+        title: const Text('Home'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/profile'); // Navigate to ProfileScreen
+          },
+          child: const Text('Go to Profile'),
         ),
       ),
     );
