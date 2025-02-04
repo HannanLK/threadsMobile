@@ -6,6 +6,7 @@ class ProductCard extends StatelessWidget {
   final String category;
   final double price;
   final String imageUrl;
+  final int stock;
   final VoidCallback onTap;
 
   const ProductCard({
@@ -14,6 +15,7 @@ class ProductCard extends StatelessWidget {
     required this.category,
     required this.price,
     required this.imageUrl,
+    required this.stock,
     required this.onTap,
   });
 
@@ -33,7 +35,7 @@ class ProductCard extends StatelessWidget {
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,
-                height: 150,
+                height: 200, // Increased height
                 width: double.infinity,
                 placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -67,6 +69,14 @@ class ProductCard extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.indigo,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    stock > 0 ? '$stock in Stock' : 'Out of Stock',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: stock > 0 ? Colors.green : Colors.red,
                     ),
                   ),
                 ],

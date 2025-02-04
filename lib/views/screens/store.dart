@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:mad/views/screens/productDetails.dart';
-import '../components/product_card.dart'; // Import the ProductCard component
+import '../components/product_details.dart'; // Import the ProductDetailsScreen
+import 'cart.dart'; // Import the CartScreen
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
 
+  // Fetch products from the API
   Future<List<dynamic>> fetchProducts(String category) async {
     final response = await http.get(Uri.parse('https://threadstore.shop/api/products/$category'));
     if (response.statusCode == 200) {
@@ -24,6 +25,7 @@ class StoreScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.indigo,
+          title: const Text('Store'),
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Mens'),
@@ -46,15 +48,16 @@ class StoreScreen extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
-                  return ListView.builder(
+                  return GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, // 2 products per row
+                      childAspectRatio: 0.7, // Adjust aspect ratio
+                    ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       var product = snapshot.data![index];
                       return ProductCard(
-                        name: product['name'],
-                        category: product['category'],
-                        price: product['price'].toDouble(),
-                        imageUrl: product['images'][0],
+                        product: product,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -78,15 +81,16 @@ class StoreScreen extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
-                  return ListView.builder(
+                  return GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.7,
+                    ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       var product = snapshot.data![index];
                       return ProductCard(
-                        name: product['name'],
-                        category: product['category'],
-                        price: product['price'].toDouble(),
-                        imageUrl: product['images'][0],
+                        product: product,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -110,15 +114,16 @@ class StoreScreen extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
-                  return ListView.builder(
+                  return GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.7,
+                    ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       var product = snapshot.data![index];
                       return ProductCard(
-                        name: product['name'],
-                        category: product['category'],
-                        price: product['price'].toDouble(),
-                        imageUrl: product['images'][0],
+                        product: product,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -132,6 +137,108 @@ class StoreScreen extends StatelessWidget {
                   );
                 }
               },
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CartScreen(),
+              ),
+            );
+          },
+          child: const Icon(Icons.shopping_cart),
+        ),
+      ),
+    );
+  }
+}
+
+// ProductCard Widget
+class ProductCard extends StatelessWidget {
+  final Map<String, dynamic> product;
+  final VoidCallback onTap;
+
+  const ProductCard({
+    super.key,
+    required this.product,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        elevation: 4,
+        margin: const EdgeInsets.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Product Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: CachedNetworkImage(
+                imageUrl: product['images'][0],
+                fit: BoxFit.cover,
+                height: 150,
+                width: double.infinity,
+                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+              ),
+            ),
+            // Product Details
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product['name'],
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    product['category'],
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '\$${product['price'].toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.indigo,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${product['stock'] > 0 ? '${product['stock']} in Stock' : 'Out of Stock'}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: product['stock'] > 0 ? Colors.green : Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Add to Cart Icon
+            Align(
+              alignment: Alignment.bottomRight,
+              child: IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  // Add to cart logic
+                },
+              ),
             ),
           ],
         ),

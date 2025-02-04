@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mad/views/screens/cart.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'controllers/theme_controller.dart';
@@ -12,6 +13,7 @@ import 'views/screens/Profile.dart'; // Import ProfileScreen
 import 'views/screens/Store.dart'; // Import StoreScreen
 import 'views/components/bottomNav.dart';
 import 'views/screens/wishlist.dart'; // Import MainScreen
+import 'views/screens/cart.dart';
 
 void main() {
   runApp(
@@ -68,6 +70,7 @@ class MyApp extends StatelessWidget {
                   '/store': (context) => const StoreScreen(), // Wrap StoreScreen with MainScreen
                   '/wishlist': (context) => const WishlistScreen(), // Wrap WishlistScreen with MainScreen
                   '/main': (context) => const MainScreen(), // Add MainScreen route
+                  '/cart': (context) => CartScreen(),
                 },
               );
             },

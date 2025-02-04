@@ -1,16 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'cart.dart'; // Import the CartScreen
 
-class ProductDetailsScreen extends StatelessWidget {
+class ProductDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> product;
 
   const ProductDetailsScreen({super.key, required this.product});
 
   @override
+  _ProductDetailsScreenState createState() => _ProductDetailsScreenState();
+}
+
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  int selectedQuantity = 1;
+  String? selectedSize;
+  String? selectedColor;
+
+  void addToCart() {
+    if (selectedSize == null || selectedColor == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select size and color')),
+      );
+      return;
+    }
+
+    if (selectedQuantity > widget.product['stock']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Quantity exceeds available stock')),
+      );
+      return;
+    }
+
+    // Add product to cart
+    CartScreen.addToCart(
+      name: widget.product['name'],
+      price: widget.product['price'],
+      color: selectedColor!,
+      size: selectedSize!,
+      image: widget.product['images'][0],
+      quantity: selectedQuantity,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Product added to cart')),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(product['name']),
+        title: Text(widget.product['name']),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -18,28 +58,10 @@ class ProductDetailsScreen extends StatelessWidget {
           children: [
             // Primary Image
             CachedNetworkImage(
-              imageUrl: product['images'][0],
+              imageUrl: widget.product['images'][0],
               fit: BoxFit.cover,
-              height: 300,
+              height: 400,
               width: double.infinity,
-            ),
-            // Other Images
-            SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: product['images'].length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: CachedNetworkImage(
-                      imageUrl: product['images'][index],
-                      fit: BoxFit.cover,
-                      width: 100,
-                    ),
-                  );
-                },
-              ),
             ),
             // Product Details
             Padding(
@@ -48,7 +70,7 @@ class ProductDetailsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product['name'],
+                    widget.product['name'],
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -56,7 +78,7 @@ class ProductDetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '\$${product['price'].toStringAsFixed(2)}',
+                    '\$${widget.product['price'].toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 20,
                       color: Colors.indigo,
@@ -64,7 +86,7 @@ class ProductDetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Category: ${product['category']}',
+                    'Category: ${widget.product['category']}',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -72,52 +94,90 @@ class ProductDetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    product['description'],
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
+                    widget.product['description'],
+                    style: const TextStyle(fontSize: 16),
+                    textAlign: TextAlign.justify,
                   ),
                   const SizedBox(height: 16),
                   // Sizes
                   Text(
-                    'Sizes: ${product['sizes'].join(', ')}',
+                    'Sizes:',
                     style: const TextStyle(
                       fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    children: widget.product['sizes'].map<Widget>((size) {
+                      return ChoiceChip(
+                        label: Text(size),
+                        selected: selectedSize == size,
+                        onSelected: (selected) {
+                          setState(() {
+                            selectedSize = size;
+                          });
+                        },
+                      );
+                    }).toList(),
                   ),
                   const SizedBox(height: 16),
                   // Colors
                   Text(
-                    'Colors: ${product['colors'].join(', ')}',
+                    'Colors:',
                     style: const TextStyle(
                       fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  Wrap(
+                    spacing: 8,
+                    children: widget.product['colors'].map<Widget>((color) {
+                      return ChoiceChip(
+                        label: Text(color),
+                        selected: selectedColor == color,
+                        onSelected: (selected) {
+                          setState(() {
+                            selectedColor = color;
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
                   const SizedBox(height: 16),
-                  // Quantity Selector and Add to Cart Button
+                  // Quantity Selector
                   Row(
                     children: [
+                      const Text('Quantity:'),
+                      const SizedBox(width: 16),
                       IconButton(
                         icon: const Icon(Icons.remove),
                         onPressed: () {
-                          // Decrease quantity
+                          setState(() {
+                            if (selectedQuantity > 1) {
+                              selectedQuantity--;
+                            }
+                          });
                         },
                       ),
-                      const Text('1'), // Replace with state management for quantity
+                      Text(selectedQuantity.toString()),
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
-                          // Increase quantity
+                          setState(() {
+                            if (selectedQuantity < widget.product['stock']) {
+                              selectedQuantity++;
+                            }
+                          });
                         },
-                      ),
-                      const Spacer(),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Add to cart logic
-                        },
-                        child: const Text('Add to Cart'),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Add to Cart Button
+                  ElevatedButton(
+                    onPressed: addToCart,
+                    child: const Text('Add to Cart'),
                   ),
                 ],
               ),
