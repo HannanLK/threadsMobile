@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'home.dart';
+import 'Home.dart'; // Import HomeScreen
 import '../../services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -19,40 +18,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final ApiService apiService = ApiService();
 
   Future<void> register() async {
-    // Check if passwords match
-    if (passwordController.text != retypePasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
-      return;
-    }
+    try {
+      // Check if passwords match
+      if (passwordController.text != retypePasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passwords do not match')),
+        );
+        return;
+      }
 
-    // Call the API to register the user
-    final response = await apiService.register(
-      nameController.text,
-      emailController.text,
-      passwordController.text,
-    );
-
-    // Handle the response
-    if (response['statusCode'] == 200) {
-      // Save the token and navigate to the home screen
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', response['token']);
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+      // Call the API to register the user
+      final response = await apiService.register(
+        nameController.text,
+        emailController.text,
+        passwordController.text,
       );
-    } else if (response['statusCode'] == 400 && response['message'] == 'Email already registered') {
-      // Handle "already registered" error
+
+      // Debug: Print the API response
+      print('API Response: $response');
+
+      // Check if the response contains a token
+      if (response['token'] != null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', response['token']);
+
+        // Debug: Print the token
+        print('Token saved: ${response['token']}');
+
+        // Navigate to HomeScreen using MaterialPageRoute
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      } else if (response['message'] == 'Email already registered') {
+        // Handle "already registered" error
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Email is already registered')),
+        );
+      } else {
+        // Handle other errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'] ?? 'Registration Failed')),
+        );
+      }
+    } catch (e) {
+      // Debug: Print any exceptions
+      print('Error during registration: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email is already registered')),
-      );
-    } else {
-      // Handle other errors
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'] ?? 'Registration Failed')),
+        const SnackBar(content: Text('An error occurred. Please try again.')),
       );
     }
   }

@@ -20,14 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/onboarding1', // First screen to show
-      routes: {
-        '/onboarding1': (context) => const OnboardingScreen1(),
-        '/onboarding2': (context) => const OnboardingScreen2(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/home': (context) => HomeScreen(),
-      },
+      home: const OnboardingScreen1(), // Set the initial screen
     );
   }
 }
