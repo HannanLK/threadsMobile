@@ -3,8 +3,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import '../services/api_service.dart'; // Import ApiService
 
 class ProfileController with ChangeNotifier {
@@ -30,13 +28,10 @@ class ProfileController with ChangeNotifier {
     String? token = prefs.getString('token');
     if (token != null) {
       try {
-        final response = await http.get(
-          Uri.parse('https://threadstore.shop/profile'),
-          headers: {'Authorization': 'Bearer $token'},
-        );
+        final response = await _apiService.fetchProfile(token); // Call fetchProfile
 
-        if (response.statusCode == 200) {
-          final userData = jsonDecode(response.body);
+        if (response['status'] == 'success') {
+          final userData = response['data'];
           _name = userData['name'];
           _email = userData['email'];
           notifyListeners();

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../components/arrow_button.dart';
-
 import 'Login.dart';
 
 class OnboardingScreen2 extends StatelessWidget {
@@ -55,7 +54,7 @@ class OnboardingScreen2 extends StatelessWidget {
               // Navigate to Login Page instead of HomePage
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => LoginScreen()), // Move to LoginScreen
+                MaterialPageRoute(builder: (context) => const LoginScreen()), // Move to LoginScreen
               );
             }),
           ],

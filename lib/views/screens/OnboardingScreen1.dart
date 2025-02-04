@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/skip_button.dart';
 import '../components/arrow_button.dart';
 import 'Login.dart';
-import '../screens/OnboardingScreen2.dart'; // Redirect to Login screen instead of Home
+import 'OnboardingScreen2.dart'; // Redirect to OnboardingScreen2
 
 class OnboardingScreen1 extends StatelessWidget {
   const OnboardingScreen1({super.key});
@@ -21,7 +21,7 @@ class OnboardingScreen1 extends StatelessWidget {
                 SkipButton(onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()), // Go to Login page
+                    MaterialPageRoute(builder: (context) => const LoginScreen()), // Go to Login page
                   );
                 }),
               ],
@@ -67,7 +67,7 @@ class OnboardingScreen1 extends StatelessWidget {
             ArrowButton(onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const OnboardingScreen2()),
+                MaterialPageRoute(builder: (context) => const OnboardingScreen2()), // Go to OnboardingScreen2
               );
             }),
           ],
