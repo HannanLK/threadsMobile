@@ -1,7 +1,7 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'cart.dart'; // Import the CartScreen
 
 class ProductDetailsScreen extends StatefulWidget {
@@ -17,6 +17,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int selectedQuantity = 1;
   String? selectedSize;
   String? selectedColor;
+  bool isWishlisted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkWishlistStatus();
+  }
 
   // Helper method to convert color string to Color object
   Color _getColorFromString(String color) {
@@ -81,11 +88,55 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
   }
 
+  // Method to check if the product is in the wishlist
+  void _checkWishlistStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> wishlist = prefs.getStringList('wishlist') ?? [];
+    setState(() {
+      isWishlisted = wishlist.contains(jsonEncode(widget.product));
+    });
+  }
+
+  // Method to toggle wishlist status
+  void _toggleWishlist() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> wishlist = prefs.getStringList('wishlist') ?? [];
+
+    if (isWishlisted) {
+      wishlist.remove(jsonEncode(widget.product));
+    } else {
+      wishlist.add(jsonEncode(widget.product));
+    }
+
+    await prefs.setStringList('wishlist', wishlist);
+    setState(() {
+      isWishlisted = !isWishlisted;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(isWishlisted ? 'Added to wishlist' : 'Removed from wishlist')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.product['name']),
+      appBar: AppBar(title: Text(widget.product['name']),
+        actions: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.black, width: 2), // Black border
+            ),
+            child: IconButton(
+              icon: Icon(
+                isWishlisted ? Icons.favorite : Icons.favorite_border,
+                color: isWishlisted ? Colors.red : Colors.white,
+              ),
+              onPressed: _toggleWishlist,
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
