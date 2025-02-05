@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'cart.dart'; // Import the CartScreen
@@ -16,7 +18,28 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   String? selectedSize;
   String? selectedColor;
 
-  void addToCart() {
+  // Helper method to convert color string to Color object
+  Color _getColorFromString(String color) {
+    switch (color.toLowerCase()) {
+      case 'red':
+        return Colors.red;
+      case 'blue':
+        return Colors.blue;
+      case 'green':
+        return Colors.green;
+      case 'yellow':
+        return Colors.yellow;
+      case 'pink':
+        return Colors.pink;
+      case 'white':
+        return Colors.white;
+      default:
+        return Colors.black;
+    }
+  }
+
+  // Method to add the product to the cart
+  void addToCart() async {
     if (selectedSize == null || selectedColor == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select size and color')),
@@ -31,19 +54,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       return;
     }
 
-    // Add product to cart
-    CartScreen.addToCart(
-      name: widget.product['name'],
-      price: widget.product['price'],
-      color: selectedColor!,
-      size: selectedSize!,
-      image: widget.product['images'][0],
-      quantity: selectedQuantity,
-    );
+    try {
+      await CartScreen.addToCart(
+        id: widget.product['id'].toString(),
+        name: widget.product['name'],
+        price: widget.product['price'],
+        color: selectedColor!,
+        size: selectedSize!,
+        image: widget.product['images'][0],
+        quantity: selectedQuantity,
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Product added to cart')),
-    );
+      // Fetch updated cart items from the backend
+      final items = await CartScreen.fetchCartItems();
+      setState(() {
+        CartScreen.cartItems = items;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Product added to cart')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add product to cart: $e')),
+      );
+    }
   }
 
   @override
@@ -57,11 +92,55 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Primary Image
-            CachedNetworkImage(
-              imageUrl: widget.product['images'][0],
-              fit: BoxFit.cover,
-              height: 400,
-              width: double.infinity,
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => Dialog(
+                    child: CachedNetworkImage(
+                      imageUrl: widget.product['images'][0],
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                );
+              },
+              child: CachedNetworkImage(
+                imageUrl: widget.product['images'][0],
+                fit: BoxFit.cover,
+                height: 400,
+                width: double.infinity,
+              ),
+            ),
+            // Other Images
+            SizedBox(
+              height: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: widget.product['images']?.length ?? 0,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => Dialog(
+                          child: CachedNetworkImage(
+                            imageUrl: widget.product['images'][index],
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CachedNetworkImage(
+                        imageUrl: widget.product['images'][index],
+                        fit: BoxFit.cover,
+                        width: 100,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
             // Product Details
             Padding(
@@ -109,17 +188,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                   Wrap(
                     spacing: 8,
-                    children: widget.product['sizes'].map<Widget>((size) {
-                      return ChoiceChip(
-                        label: Text(size),
-                        selected: selectedSize == size,
-                        onSelected: (selected) {
-                          setState(() {
-                            selectedSize = size;
-                          });
-                        },
-                      );
-                    }).toList(),
+                    children: (widget.product['sizes'] as List<dynamic>?)
+                            ?.map<Widget>((size) {
+                          return ChoiceChip(
+                            label: Text(size),
+                            selected: selectedSize == size,
+                            onSelected: (selected) {
+                              setState(() {
+                                selectedSize = size;
+                              });
+                            },
+                          );
+                        }).toList() ??
+                        [],
                   ),
                   const SizedBox(height: 16),
                   // Colors
@@ -132,17 +213,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                   Wrap(
                     spacing: 8,
-                    children: widget.product['colors'].map<Widget>((color) {
-                      return ChoiceChip(
-                        label: Text(color),
-                        selected: selectedColor == color,
-                        onSelected: (selected) {
-                          setState(() {
-                            selectedColor = color;
-                          });
-                        },
-                      );
-                    }).toList(),
+                    children: (widget.product['colors'] as List<dynamic>?)
+                            ?.map<Widget>((color) {
+                          return ChoiceChip(
+                            label: Text(color),
+                            selected: selectedColor == color,
+                            onSelected: (selected) {
+                              setState(() {
+                                selectedColor = color;
+                              });
+                            },
+                            backgroundColor: _getColorFromString(color),
+                          );
+                        }).toList() ??
+                        [],
                   ),
                   const SizedBox(height: 16),
                   // Quantity Selector

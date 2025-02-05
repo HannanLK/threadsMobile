@@ -28,7 +28,8 @@ class ProfileController with ChangeNotifier {
     String? token = prefs.getString('token');
     if (token != null) {
       try {
-        final response = await _apiService.fetchProfile(token); // Call fetchProfile
+
+        final response = await _apiService.fetchProfile(); // Call fetchProfile
 
         if (response['status'] == 'success') {
           final userData = response['data'];

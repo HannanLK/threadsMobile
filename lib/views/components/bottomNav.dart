@@ -1,56 +1,32 @@
+// filepath: /c:/Users/Hannan Munas/Desktop/mad/lib/screens/main.dart
 import 'package:flutter/material.dart';
+import 'package:mad/views/screens/home.dart';
+import 'package:mad/views/screens/profile.dart';
+import 'package:mad/views/screens/store.dart';
+import 'package:mad/views/screens/wishlist.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import '../screens/home.dart';
-import '../screens/store.dart';
-import '../screens/wishlist.dart';
-import '../screens/profile.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
+class _MainScreenState extends State<MainScreen> {
   late PersistentTabController _controller;
-  bool _isLandscape = false;
-  int _currentIndex = 0; // Track the selected tab index
 
   @override
   void initState() {
     super.initState();
     _controller = PersistentTabController(initialIndex: 0);
-    WidgetsBinding.instance.addObserver(this); // Add observer for orientation changes
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this); // Remove observer
-    super.dispose();
-  }
-
-  @override
-  void didChangeMetrics() {
-    // Called when the device orientation changes
-    final orientation = MediaQuery.of(context).orientation;
-    if (orientation == Orientation.landscape && !_isLandscape) {
-      setState(() {
-        _isLandscape = true;
-      });
-    } else if (orientation == Orientation.portrait && _isLandscape) {
-      setState(() {
-        _isLandscape = false;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _isLandscape
-          ? _buildScreens()[_currentIndex] // Show only the selected screen in landscape
-          : PersistentTabView(
+      body: PersistentTabView(
         context,
         controller: _controller,
         screens: _buildScreens(),
@@ -64,12 +40,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           borderRadius: BorderRadius.circular(10.0),
           colorBehindNavBar: Colors.white,
         ),
-        onItemSelected: (index) {
-          setState(() {
-            _currentIndex = index; // Update the selected index
-            _controller.index = index;
-          });
-        },
         navBarStyle: NavBarStyle.style1,
       ),
     );

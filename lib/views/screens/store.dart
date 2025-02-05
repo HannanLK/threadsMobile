@@ -6,7 +6,9 @@ import '../components/product_details.dart'; // Import the ProductDetailsScreen
 import 'cart.dart'; // Import the CartScreen
 
 class StoreScreen extends StatelessWidget {
-  const StoreScreen({super.key});
+  final int? initialTab;
+
+  const StoreScreen({super.key, this.initialTab});
 
   // Fetch products from the API
   Future<List<dynamic>> fetchProducts(String category) async {
@@ -22,6 +24,7 @@ class StoreScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
+      initialIndex: initialTab ?? 0, // Set the initial tab index
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.indigo,
@@ -32,9 +35,6 @@ class StoreScreen extends StatelessWidget {
               Tab(text: 'Womens'),
               Tab(text: 'Accessories'),
             ],
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
           ),
         ),
         body: TabBarView(
@@ -145,11 +145,12 @@ class StoreScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CartScreen(),
+                builder: (context) =>  CartScreen(),
               ),
             );
           },
-          child: const Icon(Icons.shopping_cart),
+          backgroundColor: Colors.blue,
+          child: const Icon(Icons.shopping_cart, color: Colors.white),
         ),
       ),
     );
@@ -221,7 +222,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${product['stock'] > 0 ? '${product['stock']} in Stock' : 'Out of Stock'}',
+                    product['stock'] > 0 ? '${product['stock']} in Stock' : 'Out of Stock',
                     style: TextStyle(
                       fontSize: 14,
                       color: product['stock'] > 0 ? Colors.green : Colors.red,
