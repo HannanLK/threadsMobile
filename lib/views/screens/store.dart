@@ -168,82 +168,72 @@ class ProductCard extends StatelessWidget {
     required this.onTap,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        elevation: 4,
-        margin: const EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: CachedNetworkImage(
-                imageUrl: product['images'][0],
-                fit: BoxFit.cover,
-                height: 150,
-                width: double.infinity,
-                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-              ),
+@override
+Widget build(BuildContext context) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Card(
+      elevation: 4,
+      margin: const EdgeInsets.all(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Product Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: CachedNetworkImage(
+              imageUrl: product['images'][0],
+              fit: BoxFit.cover,
+              height: 180, // Increased height
+              width: double.infinity,
+              placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) =>
+                  const Icon(Icons.error, size: 40),
             ),
-            // Product Details
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product['name'],
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+          ),
+          // Product Details with reduced padding
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  product['name'],
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product['category'],
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                ),
+                Text(
+                  product['category'],
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '\$${product['price'].toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.indigo,
-                    ),
+                ),
+                Text(
+                  '\$${product['price'].toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.indigo,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product['stock'] > 0 ? '${product['stock']} in Stock' : 'Out of Stock',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: product['stock'] > 0 ? Colors.green : Colors.red,
-                    ),
+                ),
+                Text(
+                  product['stock'] > 0 ? '${product['stock']} in Stock' : 'Out of Stock',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: product['stock'] > 0 ? Colors.green : Colors.red,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            // Add to Cart Icon
-            Align(
-              alignment: Alignment.bottomRight,
-              child: IconButton(
-                icon: const Icon(Icons.shopping_cart),
-                onPressed: () {
-                  // Add to cart logic
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
