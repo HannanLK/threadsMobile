@@ -1,85 +1,43 @@
-// filepath: /c:/Users/Hannan Munas/Desktop/mad/lib/screens/main.dart
 import 'package:flutter/material.dart';
-import 'package:mad/views/screens/home.dart';
-import 'package:mad/views/screens/profile.dart';
-import 'package:mad/views/screens/store.dart';
-import 'package:mad/views/screens/wishlist.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class BottomNav extends StatelessWidget {
+  final int currentIndex;
+  final void Function(int index) onTap; // Accept the onTap function as a parameter
 
-  @override
-  // ignore: library_private_types_in_public_api
-  _MainScreenState createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  late PersistentTabController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = PersistentTabController(initialIndex: 0);
-  }
+  const BottomNav({
+    super.key,
+    required this.currentIndex,
+    required this.onTap, // Make sure onTap is passed as required
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PersistentTabView(
-        context,
-        controller: _controller,
-        screens: _buildScreens(),
-        items: _navBarsItems(),
-        confineToSafeArea: true,
-        backgroundColor: Colors.white,
-        handleAndroidBackButtonPress: true,
-        resizeToAvoidBottomInset: true,
-        stateManagement: true,
-        decoration: NavBarDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          colorBehindNavBar: Colors.white,
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
+    return BottomNavigationBar(
+      currentIndex: currentIndex,
+      onTap: onTap, // Pass the onTap handler directly
+      backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+      selectedItemColor: Colors.grey, // Grey color for the active item
+      unselectedItemColor: isDarkTheme ? Colors.white70 : Colors.black54,
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
         ),
-        navBarStyle: NavBarStyle.style1,
-      ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.store),
+          label: 'Store',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.favorite_border),
+          label: 'Wishlist',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person),
+          label: 'Profile',
+        ),
+      ],
     );
-  }
-
-  List<Widget> _buildScreens() {
-    return [
-      const HomeScreen(),
-      const StoreScreen(),
-      const WishlistScreen(),
-      const ProfileScreen(),
-    ];
-  }
-
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.home),
-        title: "Home",
-        activeColorPrimary: Colors.blue,
-        inactiveColorPrimary: Colors.grey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.store),
-        title: "Store",
-        activeColorPrimary: Colors.blue,
-        inactiveColorPrimary: Colors.grey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.favorite),
-        title: "Wishlist",
-        activeColorPrimary: Colors.blue,
-        inactiveColorPrimary: Colors.grey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.person),
-        title: "Profile",
-        activeColorPrimary: Colors.blue,
-        inactiveColorPrimary: Colors.grey,
-      ),
-    ];
   }
 }

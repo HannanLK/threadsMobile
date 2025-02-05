@@ -10,6 +10,7 @@ class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key, required this.product});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ProductDetailsScreenState createState() => _ProductDetailsScreenState();
 }
 
@@ -123,18 +124,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.product['name']),
         actions: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.black, width: 2), // Black border
+          IconButton(
+            icon: Icon(
+              isWishlisted ? Icons.favorite_outlined : Icons.favorite_border_outlined,
+              color: isWishlisted ? Colors.red : Colors.white,
             ),
-            child: IconButton(
-              icon: Icon(
-                isWishlisted ? Icons.favorite : Icons.favorite_border,
-                color: isWishlisted ? Colors.red : Colors.white,
-              ),
-              onPressed: _toggleWishlist,
-            ),
+            onPressed: _toggleWishlist,
           ),
         ],
       ),
