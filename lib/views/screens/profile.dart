@@ -5,17 +5,42 @@ import 'package:image_picker/image_picker.dart';
 import '../../controllers/theme_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../components/notification_popup.dart';
+import '../components/bottomNav.dart'; // Import BottomNav
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
-  // Function to open image picker (camera or gallery)
-  Future<void> _pickImage(BuildContext context, ImageSource source) async {
-    final profileController = Provider.of<ProfileController>(context, listen: false);
-    await profileController.pickImage(source); // Call the correct method
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  int _currentIndex = 3; // Profile tab is active
+
+  void _onNavTap(int index) {
+    if (index != _currentIndex) {
+      switch (index) {
+        case 0:
+          Navigator.pushReplacementNamed(context, '/home');
+          break;
+        case 1:
+          Navigator.pushReplacementNamed(context, '/store');
+          break;
+        case 2:
+          Navigator.pushReplacementNamed(context, '/wishlist');
+          break;
+        case 3:
+          Navigator.pushReplacementNamed(context, '/profile');
+          break;
+      }
+    }
   }
 
-  // Function to show a bottom sheet for image source selection
+  Future<void> _pickImage(BuildContext context, ImageSource source) async {
+    final profileController = Provider.of<ProfileController>(context, listen: false);
+    await profileController.pickImage(source);
+  }
+
   void _showImageSourceBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -62,7 +87,6 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Avatar and User Details
             Row(
               children: [
                 GestureDetector(
@@ -97,54 +121,36 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Geo Location Toggle
             ListTile(
               title: const Text('Turn on Geo Location'),
               trailing: Switch(
                 value: profileController.geoLocationEnabled,
                 onChanged: (value) async {
                   if (value) {
-                    // Request location permission
-                    bool serviceEnabled =
-                    await Geolocator.isLocationServiceEnabled();
+                    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
                     if (!serviceEnabled) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Location services are disabled.'),
-                        ),
+                        const SnackBar(content: Text('Location services are disabled.')),
                       );
                       return;
                     }
-
-                    LocationPermission permission =
-                    await Geolocator.checkPermission();
+                    LocationPermission permission = await Geolocator.checkPermission();
                     if (permission == LocationPermission.denied) {
                       permission = await Geolocator.requestPermission();
                       if (permission == LocationPermission.denied) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Location permissions are denied.'),
-                          ),
+                          const SnackBar(content: Text('Location permissions are denied.')),
                         );
                         return;
                       }
                     }
-
                     if (permission == LocationPermission.deniedForever) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                              'Location permissions are permanently denied.'),
-                        ),
+                        const SnackBar(content: Text('Location permissions are permanently denied.')),
                       );
                       return;
                     }
-
-                    // Get current position
                     Position position = await Geolocator.getCurrentPosition();
-                    print(
-                        'Location: ${position.latitude}, ${position.longitude}');
                     profileController.setGeoLocation(position);
                   } else {
                     profileController.setGeoLocation(null);
@@ -152,16 +158,11 @@ class ProfileScreen extends StatelessWidget {
                 },
               ),
             ),
-            if (profileController.geoLocationEnabled &&
-                profileController.position != null)
+            if (profileController.geoLocationEnabled && profileController.position != null)
               ListTile(
                 title: const Text('Location'),
-                subtitle: Text(
-                  'Lat: ${profileController.position!.latitude}, Long: ${profileController.position!.longitude}',
-                ),
+                subtitle: Text('Lat: ${profileController.position!.latitude}, Long: ${profileController.position!.longitude}'),
               ),
-
-            // Notifications Toggle
             ListTile(
               title: const Text('Enable Notifications'),
               trailing: Switch(
@@ -174,14 +175,10 @@ class ProfileScreen extends StatelessWidget {
                 },
               ),
               leading: Icon(
-                profileController.notificationsEnabled
-                    ? Icons.notifications_active_outlined
-                    : Icons.notifications_off_sharp,
+                profileController.notificationsEnabled ? Icons.notifications_active_outlined : Icons.notifications_off_sharp,
                 color: Theme.of(context).iconTheme.color,
               ),
             ),
-
-            // Theme Toggle
             ListTile(
               title: const Text('Dark Mode'),
               trailing: Switch(
@@ -192,32 +189,10 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 2, // Assuming Profile is the third tab
-          onTap: (index) {
-            if (index == 0) {
-              Navigator.pushNamed(context, '/home');
-            } else if (index == 1) {
-              Navigator.pushNamed(context, '/search');
-            } else if (index == 2) {
-              Navigator.pushNamed(context, '/profile');
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: 'Search',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-        ),
+      bottomNavigationBar: BottomNav(
+        currentIndex: _currentIndex,
+        onTap: _onNavTap,
+      ),
     );
   }
 }
