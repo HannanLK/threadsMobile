@@ -5,6 +5,7 @@ import '../components/product_card.dart'; // Import the ProductCard widget
 import 'store.dart' as store; // Import the StoreScreen with alias
 import 'wishlist.dart'; // Import the WishlistScreen
 import 'cart.dart'; // Import the CartScreen
+import 'package:mad/views/components/bottomNav.dart'; // Import the BottomNav widget
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +16,27 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentBannerIndex = 0;
+  final int _currentIndex = 0; // Home tab is active
+
+  void _onNavTap(int index) {
+    if (index != _currentIndex) {
+      switch (index) {
+        case 0:
+          Navigator.pushReplacementNamed(context, '/home');
+          break;
+        case 1:
+          Navigator.pushReplacementNamed(context, '/store');
+          break;
+        case 2:
+          Navigator.pushReplacementNamed(context, '/wishlist');
+          break;
+        case 3:
+          Navigator.pushReplacementNamed(context, '/profile');
+          break;
+      }
+    }
+  }
+
   final List<String> banners = [
     'assets/images/Banner/banner1.png',
     'assets/images/Banner/banner2.png',
@@ -259,6 +281,10 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         backgroundColor: Colors.blue,
         child: const Icon(Icons.shopping_cart, color: Colors.white),
+      ),
+      bottomNavigationBar: BottomNav(
+        currentIndex: _currentIndex,
+        onTap: _onNavTap,
       ),
     );
   }
