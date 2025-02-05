@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:mad/views/components/bottomNav.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class CartScreen extends StatefulWidget {
+
   static List<Map<String, dynamic>> cartItems = [];
 
   static Future<void> addToCart({
@@ -244,13 +247,33 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                         child: const Text(
                           'Checkout',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black87),
                         ),
                       ),
                     ],
                   ),
                 ),
               ],
+            ),
+            bottomNavigationBar: BottomNav(
+              currentIndex: 1, // Store tab is active
+              onTap: (index) {
+                // Handle navigation
+                switch (index) {
+                  case 0:
+                    Navigator.pushNamed(context, '/home');
+                    break;
+                  case 1:
+                    Navigator.pushNamed(context, '/store');
+                    break;
+                  case 2:
+                    Navigator.pushNamed(context, '/wishlist');
+                    break;
+                  case 3:
+                    Navigator.pushNamed(context, '/profile');
+                    break;
+                }
+              },
             ),
     );
   }

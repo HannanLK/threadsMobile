@@ -102,7 +102,7 @@ class StoreScreen extends StatelessWidget {
                   return GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.7,
+                      childAspectRatio: 0.8,
                     ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
@@ -135,7 +135,7 @@ class StoreScreen extends StatelessWidget {
                   return GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.7,
+                      childAspectRatio: 0.8,
                     ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
