@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'cart.dart'; // Import the CartScreen
+import 'package:mad/views/components/bottomNav.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -15,6 +16,27 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  final int _currentIndex = 3;
+
+  void _onNavTap(int index) {
+    if (index != _currentIndex) {
+      switch (index) {
+        case 0:
+          Navigator.pushReplacementNamed(context, '/home');
+          break;
+        case 1:
+          Navigator.pushReplacementNamed(context, '/store');
+          break;
+        case 2:
+          Navigator.pushReplacementNamed(context, '/wishlist');
+          break;
+        case 3:
+          Navigator.pushReplacementNamed(context, '/profile');
+          break;
+      }
+    }
+  }
+
   int selectedQuantity = 1;
   String? selectedSize;
   String? selectedColor;
@@ -314,6 +336,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNav(
+      currentIndex: _currentIndex,
+      onTap: _onNavTap,
       ),
     );
   }

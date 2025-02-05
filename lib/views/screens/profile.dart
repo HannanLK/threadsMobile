@@ -15,7 +15,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  int _currentIndex = 3; // Profile tab is active
+  final int _currentIndex = 3; // Profile tab is active
 
   void _onNavTap(int index) {
     if (index != _currentIndex) {
