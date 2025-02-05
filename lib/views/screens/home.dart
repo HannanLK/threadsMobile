@@ -222,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
               return SizedBox(
-                height: 250,
+                height: 300,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: snapshot.data!.length,
