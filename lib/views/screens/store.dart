@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../components/product_details.dart'; // Import the ProductDetailsScreen
 import 'cart.dart'; // Import the CartScreen
+import 'package:mad/views/components/bottomNav.dart';
 
 class StoreScreen extends StatelessWidget {
   final int? initialTab;
@@ -17,6 +18,23 @@ class StoreScreen extends StatelessWidget {
       return json.decode(response.body);
     } else {
       throw Exception('Failed to load products');
+    }
+  }
+
+    void _onNavTapped(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, '/home'); // Replace with actual route name
+        break;
+      case 1:
+        Navigator.pushReplacementNamed(context, '/store'); // Stay on the store page
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, '/wishlist'); // Replace with actual route name
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/profile'); // Replace with actual route name
+        break;
     }
   }
 
@@ -51,7 +69,7 @@ class StoreScreen extends StatelessWidget {
                   return GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2, // 2 products per row
-                      childAspectRatio: 0.7, // Adjust aspect ratio
+                      childAspectRatio: 0.8, // Adjust aspect ratio
                     ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
@@ -140,6 +158,7 @@ class StoreScreen extends StatelessWidget {
             ),
           ],
         ),
+        
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
@@ -151,6 +170,10 @@ class StoreScreen extends StatelessWidget {
           },
           backgroundColor: Colors.blue,
           child: const Icon(Icons.shopping_cart, color: Colors.white),
+        ),
+        bottomNavigationBar: BottomNav(
+          currentIndex: 1,
+          onTap: (index) => _onNavTapped(context, index),
         ),
       ),
     );

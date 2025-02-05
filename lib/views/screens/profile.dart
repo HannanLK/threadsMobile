@@ -192,6 +192,32 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: 2, // Assuming Profile is the third tab
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.pushNamed(context, '/home');
+            } else if (index == 1) {
+              Navigator.pushNamed(context, '/search');
+            } else if (index == 2) {
+              Navigator.pushNamed(context, '/profile');
+            }
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Search',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
     );
   }
 }
