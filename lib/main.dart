@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mad/views/screens/cart.dart';
+import 'package:mad/views/screens/checkout.dart';
 import 'package:provider/provider.dart';
 import 'controllers/theme_controller.dart';
 import 'controllers/profile_controller.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         '/store': (context) => const StoreScreen(),
         '/wishlist': (context) => const WishlistScreen(),
         '/cart': (context) => CartScreen(),
+        '/checkout': (context) => CheckoutScreen(total: 0), // Provide the required 'total' parameter
       },
     );
   }

@@ -4,11 +4,14 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mad/views/components/bottomNav.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'checkout.dart';
 
 
 class CartScreen extends StatefulWidget {
 
   static List<Map<String, dynamic>> cartItems = [];
+
+  const CartScreen({super.key});
 
   static Future<void> addToCart({
     required String id,
@@ -240,6 +243,10 @@ class _CartScreenState extends State<CartScreen> {
                       ElevatedButton(
                         onPressed: () {
                           // Implement checkout functionality
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => CheckoutScreen(total: getTotalPrice(),)),
+                              );
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(

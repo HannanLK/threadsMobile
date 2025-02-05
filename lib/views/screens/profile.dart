@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../controllers/theme_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../components/notification_popup.dart';
@@ -16,6 +17,9 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final int _currentIndex = 3; // Profile tab is active
+  GoogleMapController? _mapController;
+  final LatLng _storeLocation = const LatLng(6.9186, 79.8612); // Store location coordinates
+  double _distance = 0.0;
 
   void _onNavTap(int index) {
     if (index != _currentIndex) {
@@ -68,6 +72,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       },
     );
+  }
+
+  void _updateMap(Position position) {
+    final LatLng userLocation = LatLng(position.latitude, position.longitude);
+    _mapController?.animateCamera(CameraUpdate.newLatLngZoom(userLocation, 15));
+
+    setState(() {
+      _distance = Geolocator.distanceBetween(
+        userLocation.latitude,
+        userLocation.longitude,
+        _storeLocation.latitude,
+        _storeLocation.longitude,
+      ) / 1000; // Convert to kilometers
+    });
   }
 
   @override
@@ -152,6 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     }
                     Position position = await Geolocator.getCurrentPosition();
                     profileController.setGeoLocation(position);
+                    _updateMap(position);
                   } else {
                     profileController.setGeoLocation(null);
                   }
@@ -159,9 +178,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             if (profileController.geoLocationEnabled && profileController.position != null)
-              ListTile(
-                title: const Text('Location'),
-                subtitle: Text('Lat: ${profileController.position!.latitude}, Long: ${profileController.position!.longitude}'),
+              Column(
+                children: [
+                  ListTile(
+                    title: const Text('Location'),
+                    subtitle: Text('Lat: ${profileController.position!.latitude}, Long: ${profileController.position!.longitude}'),
+                  ),
+                  SizedBox(
+                    height: 200,
+                    child: GoogleMap(
+                      onMapCreated: (controller) => _mapController = controller,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(
+                          profileController.position!.latitude,
+                          profileController.position!.longitude,
+                        ),
+                        zoom: 15,
+                      ),
+                      markers: {
+                        Marker(
+                          markerId: const MarkerId('user_location'),
+                          position: LatLng(
+                            profileController.position!.latitude,
+                            profileController.position!.longitude,
+                          ),
+                          infoWindow: const InfoWindow(title: 'Your Location'),
+                        ),
+                        Marker(
+                          markerId: const MarkerId('store_location'),
+                          position: _storeLocation,
+                          infoWindow: const InfoWindow(title: 'Store Location'),
+                        ),
+                      },
+                      polylines: {
+                        Polyline(
+                          polylineId: const PolylineId('route'),
+                          points: [
+                            LatLng(
+                              profileController.position!.latitude,
+                              profileController.position!.longitude,
+                            ),
+                            _storeLocation,
+                          ],
+                          color: Colors.blue,
+                          width: 5,
+                        ),
+                      },
+                    ),
+                  ),
+                  Text(
+                    'Distance to store: ${_distance.toStringAsFixed(2)} km',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
             ListTile(
               title: const Text('Enable Notifications'),
