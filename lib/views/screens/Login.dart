@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Home.dart'; // Import HomeScreen
@@ -7,7 +9,6 @@ import '../../services/api_service.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
-
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -16,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final ApiService apiService = ApiService();
+  bool _obscurePassword = true; // Track password visibility
 
   Future<void> login() async {
     try {
@@ -58,38 +60,138 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+      appBar: AppBar(
+        title: const Text('Login', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      extendBodyBehindAppBar: true, // Allow background image to extend behind app bar
+      body: Stack(
+        children: [
+          // Blurred background image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/Banner/runaway.jpg',
+              fit: BoxFit.cover,
             ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Blur effect
+              child: Container(color: Colors.black.withOpacity(0.3)), // Dark overlay
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: login,
-              child: const Text('Login'),
+          ),
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                padding: const EdgeInsets.all(24.0),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2), // Transparent form background
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Welcome Back',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        labelStyle: const TextStyle(color: Colors.white),
+                        prefixIcon: const Icon(Icons.email, color: Colors.white),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white.withOpacity(0.5)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      style: const TextStyle(color: Colors.white),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: const TextStyle(color: Colors.white),
+                        prefixIcon: const Icon(Icons.lock, color: Colors.white),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white.withOpacity(0.5)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      style: const TextStyle(color: Colors.white),
+                      obscureText: _obscurePassword,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white.withOpacity(0.2), // Transparent button
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 40, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                        ),
+                      ),
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(height: 16), // Correct placement outside the button
+                    TextButton(
+                      onPressed: () {
+                        // Navigate to RegisterScreen using MaterialPageRoute
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const RegisterScreen()),
+                        );
+                      },
+                      child: const Text(
+                        'Not registered? Sign up',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                // Navigate to RegisterScreen using MaterialPageRoute
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                );
-              },
-              child: const Text('Not registered? Sign up'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

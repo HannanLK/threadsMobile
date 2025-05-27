@@ -7,6 +7,7 @@ import '../../controllers/theme_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../components/notification_popup.dart';
 import '../components/bottomNav.dart'; // Import BottomNav
+import '../components/battery_status_toggle.dart'; // Import BatteryStatusToggle
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -101,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         title: const Text('Profile'),
       ),
-      body: Padding(
+      body: SingleChildScrollView( // Make the page scrollable
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -124,14 +125,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      profileController.name ?? 'John Doe',
+                      profileController.name ?? 'Hannan Munas',
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      profileController.email ?? 'johndoe@example.com',
+                      profileController.email ?? 'hannanmunas76@gmail.com',
                       style: const TextStyle(fontSize: 16),
                     ),
                   ],
@@ -255,6 +256,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onChanged: (value) => themeController.toggleTheme(),
               ),
             ),
+            const BatteryStatusToggle(), // Include the BatteryStatusToggle here
           ],
         ),
       ),
